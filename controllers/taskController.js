@@ -1,71 +1,168 @@
 // controllers/taskController.js
 const Task = require('../models/task');
+const Joi = require('joi');
 
-exports.getAllTasks = function(req, res) {
+exports.getAllTasks = function (req, res) {
     Task.getAllTasks((err, tasks) => {
-        if (err) throw err;
-        res.json(tasks);
+        if (err) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Unable to fetch tasks.",
+            });
+        }
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Tasks fetched successfully.",
+            data: tasks,
+        });
     });
 };
 
-exports.getTaskById = function(req, res) {
+exports.getTaskById = function (req, res) {
+    // Validate task_id
+    const taskId = req.params.id;
+    if (!taskId) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            error: "task_id is required"
+        });
+    }
     Task.getTaskById(req.params.id, (err, task) => {
-        if (err) throw err;
-        res.json(task);
+        if (err) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Unable to fetch task.",
+            });
+        }
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Task fetched successfully.",
+            data: task,
+        });
     });
 };
 
-exports.createTask = function(req, res) {
+exports.createTask = function (req, res) {
     const { title, description, due_date, status } = req.body;
+
+    // Validate required fields with joi
+    const schema = Joi.object({
+        title: Joi.string().required(),
+        description: Joi.string().required(),
+        due_date: Joi.date().required(),
+        status: Joi.string().valid('pending', 'in-progress', 'completed').required(),
+    });
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: 400,
+            success: false, message: error.details[0].message
+        });
+    }
 
     // Validate status
     const validStatuses = ["pending", "in-progress", "completed"];
     if (!validStatuses.includes(status)) {
-        return res.status(400).json({ error: "Invalid status value" });
+        return res.status(400).json({
+            status: 400,
+            success: false, message: "Invalid status value"
+        });
     }
 
+    const created_at = new Date();
+    const updated_at = new Date();
     const newTask = {
         title,
         description,
         due_date,
-        status
+        status,
+        created_at,
+        updated_at
     };
 
     if (!newTask.title || !newTask.description || !newTask.due_date || !newTask.status) {
-        return res.status(400).json({ error: "All fields are required" });
+        return res.status(400).json({
+            status: 400,
+            success: false, message: "All fields are required"
+        });
     }
 
+
+
     Task.createTask(newTask, (err, result) => {
-        if (err) throw err;
-        res.json({ message: 'Task created successfully' });
+        if (err) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Unable to create task.",
+            });
+        }
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Task created successfully.",
+
+        });
     });
 };
 
-exports.updateTask = function(req, res) {
+exports.updateTask = function (req, res) {
     const { title, description, due_date, status } = req.body;
 
-    // Validate status
-    const validStatuses = ["pending", "in-progress", "completed"];
-    if (status && !validStatuses.includes(status)) {
-        return res.status(400).json({ error: "Invalid status value" });
+    // validate id
+    if (!req.params.id) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "task_id is required",
+        });
     }
 
+
+    const updated_at = new Date();
     const updatedTask = {
         title,
         description,
         due_date,
-        status
+        status,
+        updated_at
     };
 
     Task.updateTask(req.params.id, updatedTask, (err, result) => {
-        if (err) throw err;
-        res.json({ message: 'Task updated successfully' });
+        if (err) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Unable to update task.",
+            });
+        }
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Task updated successfully.",
+
+        });
     });
 };
 
-exports.deleteTask = function(req, res) {
+exports.deleteTask = function (req, res) {
     Task.deleteTask(req.params.id, (err, result) => {
-        if (err) throw err;
-        res.json({ message: 'Task deleted successfully' });
+        if (err) {
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Unable to delete task.",
+            });
+        }
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Task deleted successfully.",
+        });
     });
 };
