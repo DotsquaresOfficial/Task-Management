@@ -96,6 +96,12 @@ PORT=3000
        status ENUM('pending', 'in-progress', 'completed') DEFAULT 'pending'
    );
    ```
+5. Import the Database
+    Open your MySQL client or terminal.
+    Log in to your MySQL server:
+    Create the database:
+    Import the task.sql file into the database:
+
 
 ### 5. Start the Server
 ```bash
