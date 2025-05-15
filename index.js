@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const taskRoutes = require("./routes/taskRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
+const errorHandler = require("./middleware/errorHandler");
 
 require("dotenv").config();
 
@@ -22,7 +23,9 @@ app.use(cors());
 app.use("/task-management", taskRoutes);
 
 // Error middleware
+app.use(errorHandler);
 app.use(errorMiddleware);
+
 
 // Start the server
 app.listen(PORT, () => {
