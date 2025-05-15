@@ -26,13 +26,21 @@ This is a RESTful API for managing tasks, built using Node.js, Express, and MySQ
 task-management-api
 ├── src
 │   ├── config
-│   │   └── dbConfig.js          # MySQL database connection
+│   │   └── database.js          # MySQL database connection
+│   ├── databse
+│   │   └── task.sql             # Database Sample
 │   ├── controllers
 │   │   └── taskController.js    # Handles API requests
 │   ├── middlewares
-│   │   ├── errorMiddleware.js    # Handles validation errors
+│   │   ├── errorHandler.js           
+│   │   ├── errorMiddleware.js         
+│   │   ├── validationMiddleware.js    # Handles validation errors
 │   ├── models
-│   │   └── taskModel.js         # Task schema 
+│   │   └── tasks.js         # Task schema 
+│   ├── utils
+│   │   └── logger.js        # Logs Errors
+│   ├── validations
+│   │   └── taskValidation.js    # Task Validator
 │   ├── routes
 │   │   └── taskRoutes.js        # API routes
 │   └── index.js                   # Main application entry point
